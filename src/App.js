@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import {Login} from "./pages/Login";
 import AuthService from "./service/auth.service";
+import {Home} from "./pages/Home";
 
 const App = () => {
     const [currentUser, setCurrentUser] = useState(undefined);
@@ -23,7 +24,7 @@ const App = () => {
                 <Routes>
                     <Route path={'/'} element={<Login/>}/>
                     {/*{currentUser?*/}
-                    {/*    <Route path={'/home'} element={<Home/>}/>*/}
+                        <Route path={'/home'} element={<Home/>}/>
                     {/*:("")*/}
                     }
 
