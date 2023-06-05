@@ -1,14 +1,86 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import {Dropdown} from "primereact/dropdown";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import {Button} from "primereact/button";
+import {Dialog} from "primereact/dialog";
+import {InputText} from "primereact/inputtext";
+import {InputTextarea} from "primereact/inputtextarea";
 
 export const Home = () => {
+    const state = ({
+
+    })
     const [data, setData] = useState([]);
+    const [material, setMaterial] = useState([]);
+    const [color, setColor] = useState([]);
+    const [sizes, setSizes] = useState([]);
+    const [dataCategory, setDataCategory] = useState([]);
+    const [dataBrand, setDataBrand] = useState([]);
+    const [dataDiscount, setDataDiscount] = useState([]);
+    const navigate = useNavigate()
+    const [showModal, setShowModal] = useState(false);
+
     useEffect(() => {
-        axios.get('http://localhost:3030/mv-core/v1/admin/product/?page=1&size=1')
+        axios.get('http://localhost:3030/mv-core/v1/admin/product/?page=1&size=5')
             .then(res => setData(res.data))
             .catch(err => console.log(err))
 
     }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/brand')
+            .then(res => setDataBrand(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/categories')
+            .then(res => setDataCategory(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/discount')
+            .then(res => setDataDiscount(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/material')
+            .then(res => setMaterial(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/colors')
+            .then(res => setColor(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/sizes')
+            .then(res => setSizes(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+    const handleDelete = async (id) => {
+        const conf = window.confirm("Do you want to delete")
+        if (conf) {
+            axios.delete('http://localhost:3030/mv-core/v1/admin/product/delete/' + id)
+                .then(res => {
+                    alert('record has deleted');
+                    return navigate('/home');
+                }).catch(err => console.log(err))
+        }
+    }
+    const footerContent = (
+        <div>
+            <Button label="Cancel" icon="pi pi-times" onClick={() => setShowModal(false)} className="p-button-text"/>
+            <Button label="Submit" icon="pi pi-check" onClick={() => setShowModal(false)} autoFocus/>
+        </div>
+    );
     return (
         <>
 
@@ -138,22 +210,92 @@ export const Home = () => {
                                             <th scope="col" className="px-6 py-4">#</th>
                                             <th scope="col" className="px-6 py-4">Name</th>
                                             <th scope="col" className="px-6 py-4">Price</th>
-                                            <th scope="col" className="px-6 py-4">Descriptioniy</th>
+                                            <th scope="col" className="px-6 py-4">Description</th>
+                                            <th scope="col" className="px-6 py-4">Operation</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {
                                             data.data?.map((user, index) => {
-                                                return <tr className="border-b dark:border-neutral-500" id={user} key={index}>
-                                                    <td className="whitespace-nowrap px-6 py-4 font-medium">{user.id}</td>
-                                                    <td className="whitespace-nowrap px-6 py-4 font-medium">c </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 font-medium">c</td>
-                                                    <td className="whitespace-nowrap px-6 py-4 font-medium">{user.description}</td>
+                                                return <tr className="border-b dark:border-neutral-500" id={user}
+                                                           key={index}>
+                                                    {user.status === "NEW" ?
+
+                                                        <td className="whitespace-nowrap px-6 py-4 font-medium">
+                                                            {user?.id}</td> : ""}
+                                                    {user.status === "NEW" ?
+                                                        <td className="whitespace-nowrap px-6 py-4 font-medium">
+                                                            {user.name}</td> : ""}
+                                                    {user.status === "NEW" ?
+                                                        <td className="whitespace-nowrap px-6 py-4 font-medium">
+                                                            c</td> : ""}
+                                                    {user.status === "NEW" ?
+                                                        <td className="whitespace-nowrap px-6 py-4 font-medium">
+                                                            c</td> : ""}
+                                                    {user.status === "NEW" ?
+                                                        <td className="whitespace-nowrap px-6 py-4 font-medium">
+
+                                                            <Button label="Update" icon="pi pi-external-link"
+                                                                    onClick={() => setShowModal(true)}/>
+
+                                                            <button onClick={event => handleDelete(user.id)}
+                                                                    className="rounded-full bg-red-600 w-20 p-2">
+                                                                Delete
+                                                            </button>
+                                                        </td> : ""}
                                                 </tr>
                                             })
                                         }
                                         </tbody>
                                     </table>
+                                    <div className="p-2">
+                                        <Button label="Create" icon=" pi pi-external-link"
+                                                onClick={() => setShowModal(true)}/>
+                                    </div>
+                                    <Dialog className={"flex"} header="Create" visible={showModal}
+                                            style={{width: '50vw'}}
+                                            onHide={() => setShowModal(false)} footer={footerContent}>
+                                        <div className={"flex items-center justify-between p-2"}>
+                                            < Dropdown value={dataBrand?.data} onChange={(e) => setDataBrand(e.value)}
+                                                       options={dataBrand?.data} optionLabel="name"
+                                                       placeholder="Brand" className="w-2/5"/>
+                                            < Dropdown value={dataCategory?.data}
+                                                       onChange={(e) => setDataCategory(e.value)}
+                                                       options={dataCategory?.data} optionLabel="name"
+                                                       placeholder="Category" className="w-2/5 "/>
+                                        </div>
+
+                                        <div className={"flex items-center justify-between p-2"}>
+
+                                            < Dropdown value={dataDiscount?.data}
+                                                       onChange={(e) => setDataDiscount(e.value)}
+                                                       options={dataDiscount?.data} optionLabel="name"
+                                                       placeholder="Discount" className="w-2/5"/>
+                                            < Dropdown value={material?.data} onChange={(e) => setMaterial(e.value)}
+                                                       options={material?.data} optionLabel="name"
+                                                       placeholder="Material" className="w-2/5"/>
+                                        </div>
+                                        <div className={"flex items-center justify-between p-2"}>
+
+                                            < Dropdown value={color?.data} onChange={(e) => setColor(e.value)}
+                                                       options={color?.data} optionLabel="name"
+                                                       placeholder="Color" className="w-2/5"/>
+                                            < Dropdown value={sizes?.data} onChange={(e) => setSizes(e.value)}
+                                                       options={sizes?.data} optionLabel="name"
+                                                       placeholder="Sizes" className="w-2/5"/>
+                                        </div>
+                                        <div className={"flex p-2"}>
+                                            <InputText className={"w-full "} type="text" placeholder="Name" />
+                                        </div>
+                                        <div className={"flex items-center justify-between p-2"}>
+                                        <InputText keyfilter="int" placeholder="Price" className={'w-2/5'}/>
+                                        <InputText keyfilter="int" placeholder="Quantity" className={'w-2/5'}/>
+                                        </div>
+                                        <div className={"flex items-center justify-between p-2"}>
+                                            <InputTextarea rows={5} cols={30} className=" w-full" placeholder={"Description"} />
+                                        </div>
+                                    </Dialog>
+
                                 </div>
                             </div>
                         </div>
