@@ -10,6 +10,7 @@ import {Dialog} from "primereact/dialog";
 import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Brand} from "../components/Brand";
+import {Product} from "../components/product";
 
 export const Home = () => {
     const [activeIndex, setActiveIndex] = useState(3);
@@ -20,7 +21,7 @@ export const Home = () => {
         {label: 'Brand', icon: 'pi pi-fw pi-home'},
         {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
         {label: 'Edit', icon: 'pi pi-fw pi-pencil'},
-        {label: 'Documentation', icon: 'pi pi-fw pi-file'},
+        {label: 'Product', icon: 'pi pi-fw pi-file'},
         {label: 'Settings', icon: 'pi pi-fw pi-cog'}
     ];
     useEffect(() => {
@@ -55,6 +56,9 @@ export const Home = () => {
             <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
             {activeIndex==0?
                 <Brand></Brand>:""
+            }
+            {activeIndex==3?
+                <Product></Product>:""
             }
         </div>
     )
