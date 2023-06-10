@@ -11,14 +11,17 @@ import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Brand} from "../components/Brand";
 import {Product} from "../components/product";
+import {Material} from "../components/Material";
 
 export const Home = () => {
     const [activeIndex, setActiveIndex] = useState(3);
     const [dataBrand, setDataBrand] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [dataMaterial, setDataMaterial] = useState([]);
 
     const items = [
         {label: 'Brand', icon: 'pi pi-fw pi-home'},
+        {label: 'Material', icon: 'pi pi-fw pi-material'},
         {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
         {label: 'Edit', icon: 'pi pi-fw pi-pencil'},
         {label: 'Product', icon: 'pi pi-fw pi-file'},
@@ -27,6 +30,13 @@ export const Home = () => {
     useEffect(() => {
         axios.get('http://localhost:3030/mv-core/v1/admin/brand')
             .then(res => setDataBrand(res.data))
+            .catch(err => console.log(err))
+
+    }, [])
+
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/material')
+            .then(res => setDataMaterial(res.data))
             .catch(err => console.log(err))
 
     }, [])
@@ -57,7 +67,10 @@ export const Home = () => {
             {activeIndex==0?
                 <Brand></Brand>:""
             }
-            {activeIndex==3?
+            {activeIndex==1?
+                <Material></Material>: ""
+            }
+            {activeIndex==4?
                 <Product></Product>:""
             }
         </div>
