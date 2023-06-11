@@ -1,0 +1,8 @@
+
+*.json
+node_modules/.cache/.eslintcache
+*.pack
+*.pack
+*.old
+*.pack
+node_modules/*
