@@ -12,16 +12,22 @@ import {InputTextarea} from "primereact/inputtextarea";
 import {Brand} from "../components/Brand";
 import {Product} from "../components/product";
 import {Material} from "../components/Material";
+import { Category } from "../components/Category";
+import { Color } from "../components/Color";
 
 export const Home = () => {
     const [activeIndex, setActiveIndex] = useState(3);
     const [dataBrand, setDataBrand] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [dataMaterial, setDataMaterial] = useState([]);
+    const [dataCategory, setDataCategory] = useState([]);
+    const [dataColor, setDataColor] = useState([]);
 
     const items = [
         {label: 'Brand', icon: 'pi pi-fw pi-home'},
         {label: 'Material', icon: 'pi pi-fw pi-material'},
+        {label: 'Category', icon: 'pi pi-fw pi-calendar'},
+        {label: 'Color', icon: 'pi pi-fw pi-calendar'},
         {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
         {label: 'Edit', icon: 'pi pi-fw pi-pencil'},
         {label: 'Product', icon: 'pi pi-fw pi-file'},
@@ -39,6 +45,18 @@ export const Home = () => {
             .then(res => setDataMaterial(res.data))
             .catch(err => console.log(err))
 
+    }, [])
+    
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/categories')
+            .then(res => setDataCategory(res.data))
+            .catch(err => console.log(err))
+    }, [])
+
+    useEffect(() => {
+        axios.get('http://localhost:3030/mv-core/v1/admin/colors')
+            .then(res => setDataColor(res.data))
+            .catch(err => console.log(err))
     }, [])
     const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
     const paginatorRight = <Button type="button" icon="pi pi-download" text />;
@@ -69,6 +87,12 @@ export const Home = () => {
             }
             {activeIndex==1?
                 <Material></Material>: ""
+            }
+            {activeIndex==2?
+                <Category></Category>: ""
+            }
+            {activeIndex==3?
+                <Color></Color>: ""
             }
             {activeIndex==4?
                 <Product></Product>:""
