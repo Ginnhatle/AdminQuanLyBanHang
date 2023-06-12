@@ -29,19 +29,19 @@ export const HomeTest = () => {
             }
         ]
     });
-    const {
-        brandid,
-        categoryid,
-        description,
-        discountid,
-        materialid,
-        name,
-        price,
-        colorid,
-        productDetailId,
-        quantity,
-        sizeid
-    } = formData;
+    // const {
+    //     brandid,
+    //     categoryid,
+    //     description,
+    //     discountid,
+    //     materialid,
+    //     name,
+    //     price,
+    //     colorid,
+    //     productDetailId,
+    //     quantity,
+    //     sizeid
+    // } = formData;
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -123,22 +123,22 @@ export const HomeTest = () => {
                 .then(res => {
 
                     setData([...data, res.data]);
-                    setFormData({    brandid: 0,
-                        categoryid: 0,
-                        description: "",
-                        discountid: 0,
-                        materialid: 0,
-                        name: "",
-                        price: 0,
-                        productDetailRequests: [
-                            {
-                                colorid: 0,
-                                discountid: 0,
-                                productDetailId: 0,
-                                quantity: 0,
-                                sizeid: 0
-                            }
-                        ] });
+                    // setFormData({    brandid: 0,
+                    //     categoryid: 0,
+                    //     description: "",
+                    //     discountid: 0,
+                    //     materialid: 0,
+                    //     name: "",
+                    //     price: 0,
+                    //     productDetailRequests: [
+                    //         {
+                    //             colorid: 0,
+                    //             discountid: 0,
+                    //             productDetailId: 0,
+                    //             quantity: 0,
+                    //             sizeid: 0
+                    //         }
+                    //     ] });
 
                 })
                 .catch(err => console.log(err))

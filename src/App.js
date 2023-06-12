@@ -27,6 +27,8 @@ const App = () => {
                     <Route path={'/'} element={<Login/>}/>
                     {/*{currentUser?*/}
                         <Route path={'/home'} element={<Home/>}/>
+                    {/*<Route path="/post/:id" element={<Post />} />*/}
+
                     {/*:("")*/}
                     }
 

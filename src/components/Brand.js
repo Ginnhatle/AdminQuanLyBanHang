@@ -10,10 +10,15 @@ import {Dialog} from "primereact/dialog";
 import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import {FilterMatchMode, FilterOperator} from "primereact/api";
+import {useNavigate, useParams} from "react-router-dom";
+import {redirect} from "react-router-dom";
 
 export const Brand = () => {
     const [dataBrand, setDataBrand] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [showModalUpdate, setShowModalUpdate] = useState(false);
+    const navigate = useNavigate();
+    const { id } = useParams();
 
     const [formData, setFormData] = useState({
         id: null,
@@ -46,13 +51,30 @@ export const Brand = () => {
 
         // }
     };
+    const handleUpdate = (e) => {
+
+        // if (userId && id && title && body) {
+        axios.post(`http://localhost:3030/mv-core/v1/admin/brand/saveOrUpdate/${id}`, formData)
+            .then(res => {
+                setDataBrand([...dataBrand, res.data]);
+            })
+            .catch(err => console.log(err))
+
+        // }
+    };
     const footerContent = (
         <div>
             <Button label="Cancel" icon="pi pi-times" onClick={() => setShowModal(false)} className="p-button-text"/>
             <Button label="Submit" icon="pi pi-check" onClick={handleSubmit} autoFocus/>
         </div>
     );
-
+    const footerContentUpdate = (rowData) => {
+        console.log(rowData,1111111111111111)
+        return <div>
+        <Button label="Cancel" icon="pi pi-times" onClick={() => setShowModal(false)} className="p-button-text"/>
+        <Button label="Submit" icon="pi pi-check" onClick={event => handleUpdate(rowData.id)} autoFocus/>
+    </div>
+}
 
     const onChangeData = (value, name) => {
         let _data = {...formData}
@@ -83,6 +105,15 @@ export const Brand = () => {
     const clearFilter = () => {
         initFilters();
     };
+    const handleDelete = async (id) => {
+        const conf = window.confirm("Do you want to delete")
+        if (conf) {
+            axios.post('http://localhost:3030/mv-core/v1/admin/brand/delete/' + id)
+                .then(res => {
+                }).catch(err => console.log(err))
+            // navigate("/home/brand");
+        }
+    }
     const renderHeader = () => {
         return (<div className="flex items-center justify-between">
             <Button type="button" icon="pi pi-filter-slash" label="Add" outlined
@@ -95,6 +126,13 @@ export const Brand = () => {
                         placeholder="Keyword Search"/>
                 </span>
         </div>);
+    };
+    const operation = (rowData) => {
+        return <div>
+            <Button label="Delete" severity="danger" onClick={event => handleDelete(rowData.id)} autoFocus/>
+
+            <Button label="Update" rowData={rowData} onClick={() => setShowModalUpdate(true)}/>
+        </div>
     };
     const header = renderHeader();
 
@@ -114,7 +152,9 @@ export const Brand = () => {
                        paginatorRight={paginatorRight}>
                 <Column field="name" header="Name" style={{width: '25%'}}></Column>
                 <Column field="description" header="Description" style={{width: '25%'}}></Column>
-                <Column header="operation" style={{width: '25%'}}></Column>
+                <Column header="operation" body={operation} style={{width: '25%'}}>
+
+                </Column>
             </DataTable>
             <Dialog className={"flex"} header="Create" visible={showModal}
                     style={{width: '50vw'}}
@@ -124,6 +164,26 @@ export const Brand = () => {
                     <InputText className={"w-full "}
                                type="text"
                                placeholder="Name"
+                               onChange={(e) => onChangeData(e.target.value, "name")}
+                    />
+                </div>
+                <div className={"flex items-center justify-between p-2"}>
+                    <InputTextarea rows={5} cols={30}
+                                   className=" w-full"
+                                   onChange={(e) => onChangeData(e.target.value, "description")}
+                                   placeholder={"Description"}/>
+                </div>
+            </Dialog>
+            <Dialog className={"flex"} header="Update" visible={showModalUpdate}
+                    style={{width: '50vw'}}
+                    onHide={() => setShowModalUpdate(false)} footer={footerContentUpdate}>
+
+                <div className={"flex p-2"}>
+                    <InputText className={"w-full "}
+                               type="text"
+                               placeholder="Name"
+                               name={"name"}
+                               value={dataBrand?.name}
                                onChange={(e) => onChangeData(e.target.value, "name")}
                     />
                 </div>

@@ -11,6 +11,7 @@ import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Brand} from "../components/Brand";
 import {Product} from "../components/product";
+import {useNavigate} from "react-router-dom";
 
 export const Home = () => {
     const [activeIndex, setActiveIndex] = useState(3);
@@ -18,7 +19,9 @@ export const Home = () => {
     const [showModal, setShowModal] = useState(false);
 
     const items = [
-        {label: 'Brand', icon: 'pi pi-fw pi-home'},
+        {label: 'Brand', icon: 'pi pi-fw pi-home'
+            // , routerLink: 'home/brand'
+        },
         {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
         {label: 'Edit', icon: 'pi pi-fw pi-pencil'},
         {label: 'Product', icon: 'pi pi-fw pi-file'},
@@ -49,6 +52,7 @@ export const Home = () => {
         );
     };
     const header = renderHeader();
+    const navigate = useNavigate();
 
     return (
         <div className="card">

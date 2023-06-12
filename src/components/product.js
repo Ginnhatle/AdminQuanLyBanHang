@@ -11,10 +11,12 @@ import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import {FilterMatchMode, FilterOperator} from "primereact/api";
 import {useNavigate} from "react-router-dom";
+import {Fieldset} from "primereact/fieldset";
 
 export const Product = () => {
     const [dataBrand, setDataBrand] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [name, setName] = useState("");
 
 
     useEffect(() => {
@@ -44,22 +46,22 @@ export const Product = () => {
             }
         ]
     });
-    const {
-        brandid,
-        categoryid,
-        description,
-        discountid,
-        materialid,
-        name,
-        price,
-        colorid,
-        productDetailId,
-        quantity,
-        sizeid
-    } = formData;
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    // const {
+    //     brandid,
+    //     categoryid,
+    //     description,
+    //     discountid,
+    //     materialid,
+    //     name,
+    //     price,
+    //     colorid,
+    //     productDetailId,
+    //     quantity,
+    //     sizeid
+    // } = formData;
+    // const handleChange = (e) => {
+    //     setFormData({...formData, [e.target.name]: e.target.value});
+    // };
     const [data, setData] = useState([]);
     const [material, setMaterial] = useState([]);
     const [color, setColor] = useState([]);
@@ -67,7 +69,6 @@ export const Product = () => {
     const [dataCategory, setDataCategory] = useState([]);
     const [dataDiscount, setDataDiscount] = useState([]);
     const navigate = useNavigate()
-    const [name1, setName] = useState("");
 
 
     useEffect(() => {
@@ -127,24 +128,10 @@ export const Product = () => {
         // if (userId && id && title && body) {
         axios.post('http://localhost:3030/mv-core/v1/admin/products/create/', formData)
             .then(res => {
+                console.log(res,1111)
 
                 setData([...data, res.data]);
-                setFormData({    brandid: 0,
-                    categoryid: 0,
-                    description: "",
-                    discountid: 0,
-                    materialid: 0,
-                    name: "",
-                    price: 0,
-                    productDetailRequests: [
-                        {
-                            colorid: 0,
-                            discountid: 0,
-                            productDetailId: 0,
-                            quantity: 0,
-                            sizeid: 0
-                        }
-                    ] });
+
 
             })
             .catch(err => console.log(err))
@@ -161,8 +148,7 @@ export const Product = () => {
 
     const onChangeData = (value, name) => {
         let _data = {...formData}
-
-        _data[name] = value
+        _data.productDetailRequests[name] = value
         console.log(_data)
         setFormData(_data)
     }
@@ -202,6 +188,7 @@ export const Product = () => {
         </div>);
     };
     const header = renderHeader();
+    const [selectedCity, setSelectedCity] = useState(null);
 
     return (
 
@@ -224,13 +211,25 @@ export const Product = () => {
             <Dialog className={"flex"} header="Create" visible={showModal}
                     style={{width: '50vw'}}
                     onHide={() => setShowModal(false)} footer={footerContent}>
-
                 <div className={"flex items-center justify-between p-2"}>
-                    < Dropdown value={dataBrand?.data} onChange={(e)=>onChangeData(e.value , "brandid")}
+                    <InputText
+                        name="name"
+                        onChange={(e)=>onChangeData(e.target.value, "name")}
+                        className={"w-2/5 "} type="text" placeholder="Name"/>
+                    <InputText keyfilter="int"
+                               onChange={(e)=>onChangeData(e.target.value, "price")}
+                               placeholder="Price"
+                               className={'w-2/5'}/>
+
+                </div>
+                <div className={"flex items-center justify-between p-2"}>
+                    < Dropdown
+                        value={selectedCity}
+                               onChange={(e) => onChangeData(e.value.id, "brandid")}
                                options={dataBrand?.data} optionLabel="name"
                                placeholder="Brand" className="w-2/5"/>
                     < Dropdown value={dataCategory?.data}
-                               onChange={(e) => onChangeData(e.value , "categoryid")}
+                               onChange={(e) => onChangeData(e.value.id, "categoryid")}
                                options={dataCategory?.data} optionLabel="name"
                                placeholder="Category" className="w-2/5 "/>
                 </div>
@@ -238,33 +237,38 @@ export const Product = () => {
                 <div className={"flex items-center justify-between p-2"}>
 
                     < Dropdown value={dataDiscount?.data}
-                               onChange={(e) => setDataDiscount(e.value)}
+                               onChange={(e) => onChangeData(e.value.id, "discountid")}
                                options={dataDiscount?.data} optionLabel="name"
                                placeholder="Discount" className="w-2/5"/>
-                    < Dropdown value={material?.data} onChange={(e) => setMaterial(e.value)}
+                    < Dropdown value={material?.data}
+                               onChange={(e) => onChangeData(e.value.id, "materialid")}
                                options={material?.data} optionLabel="name"
                                placeholder="Material" className="w-2/5"/>
                 </div>
-                <div className={"flex items-center justify-between p-2"}>
 
-                    < Dropdown value={color?.data} onChange={(e) => setColor(e.value)}
-                               options={color?.data} optionLabel="name"
-                               placeholder="Color" className="w-2/5"/>
-                    < Dropdown value={sizes?.data} onChange={(e) => setSizes(e.value)}
-                               options={sizes?.data} optionLabel="name"
-                               placeholder="Sizes" className="w-2/5"/>
-                </div>
-                <div className={"flex p-2"}>
-                    <InputText value={dataDiscount?.data} className={"w-full "} type="text" placeholder="Name"/>
-                </div>
                 <div className={"flex items-center justify-between p-2"}>
-                    <InputText keyfilter="int" placeholder="Price" className={'w-2/5'}/>
-                    <InputText keyfilter="int" placeholder="Quantity" className={'w-2/5'}/>
                 </div>
                 <div className={"flex items-center justify-between p-2"}>
                     <InputTextarea rows={5} cols={30} className=" w-full"
                                    placeholder={"Description"}/>
                 </div>
+                <Fieldset legend={"Product detail"}>
+                    <div className={"flex items-center justify-between p-2"}>
+
+                        < Dropdown value={color?.data}
+                                   onChange={(e) => onChangeData(e.value.id,"colorid")}
+                                   options={color?.data} optionLabel="name"
+                                   placeholder="Color" className="w-2/5"/>
+                        <InputText value={dataDiscount?.data} className={"w-2/5"} type="text" placeholder="Name"/>
+                    </div>
+                    <div className={"flex items-center justify-between p-2"}>
+                        < Dropdown value={sizes?.data} onChange={(e) => setSizes(e.value)}
+                                   options={sizes?.data} optionLabel="name"
+                                   placeholder="Sizes" className="w-2/5"/>
+                        <InputText keyfilter="int" placeholder="Quantity" className={'w-2/5'}/>
+
+                    </div>
+                </Fieldset>
             </Dialog>
         </div>
 
