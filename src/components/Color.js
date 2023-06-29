@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -8,58 +8,59 @@ import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { InputTextarea } from "primereact/inputtextarea";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
+import React, { useRef } from 'react';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog } from 'primereact/confirmdialog'; // For <ConfirmDialog /> component
 import { confirmDialog } from 'primereact/confirmdialog'; // For confirmDialog method
 
-
-export const Material = () => {
-    const [dataMaterial, setDataMaterial] = useState([]);
-    const [showModalUpdate, setShowModalUpdate] = useState(false);
+export const Color = () => {
+    const [dataColor, setDataColor] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const toast = useRef(null);
-    const [formData, setFormData] = useState({});
+    const [showModalUpdate, setShowModalUpdate] = useState(false);
     const [filters, setFilters] = useState(null);
 
+    const toast = useRef(null);
+    const [formData, setFormData] = useState({});
     useEffect(() => {
         gets();
         initFilters();
+        setFormData({});
     }, [])
     const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
     const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
-    // Get all
+    // Get data
     function gets() {
-        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/material')
-            .then(res => setDataMaterial(res.data.data))
+        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/colors')
+            .then(res => setDataColor(res.data.data))
             .catch(err => { });
     }
-    // Add new
+
+    // Add new brand
     const handleSubmit = (e) => {
         e.preventDefault();
         formData.id = null;
-        console.log(formData);
-        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/material/saveOrUpdate', formData)
+        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/colors/create', formData)
             .then(res => {
-                setDataMaterial([...dataMaterial, res.data.data]);
-                setFormData({});
-                setShowModal(false);
                 if (res.status === 200) {
-                    toast.current.show({
-                        severity: 'success',
-                        summary: 'Success Message',
-                        detail: 'Thêm thành công',
-                    });
-                    gets();
+                    if (res.status === 200) {
+                        toast.current.show({
+                            severity: 'success',
+                            summary: 'Success Message',
+                            detail: 'Thêm thành công',
+                        });
+                        gets();
+                    }
                 }
             })
-            .catch(err => { })
+            .catch(err => { });
+        setShowModal(false);
+        setFormData({});
     };
 
-    // Update
+    // Update brand
     const handleUpdate = (e) => {
-        console.log(formData);
-        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/material/saveOrUpdate`, formData)
+        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/colors/update/${formData.id}`, formData)
             .then(res => {
                 if (res.status === 200) {
                     toast.current.show({
@@ -72,9 +73,10 @@ export const Material = () => {
             })
             .catch(err => { })
         setShowModalUpdate(false);
+        setFormData({});
     };
 
-    // Delete
+
     // Confirm delete
     const confirmDelete = async (id) => {
         confirmDialog({
@@ -82,7 +84,7 @@ export const Material = () => {
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                axios.delete('http://13.54.43.177:3030/mv-core/v1/admin/material/delete/' + id)
+                axios.delete('http://13.54.43.177:3030/mv-core/v1/admin/colors/delete/' + id)
                     .then(res => {
                         if (res.status === 200) {
                             toast.current.show({
@@ -100,9 +102,6 @@ export const Material = () => {
                         });
                     });
             },
-            reject: () => {
-                toast.current.show({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-            }
         });
     };
 
@@ -113,40 +112,26 @@ export const Material = () => {
         </div>
     );
 
-    const footerContentUpdate = () => {
-        return <div>
-            <Button label="Cancel" icon="pi pi-times" onClick={() => setShowModalUpdate(false)} className="p-button-text" />
-            <Button label="Submit" icon="pi pi-check" onClick={(rowdata) => handleUpdate(rowdata?.id)} autoFocus />
-        </div>
-    }
-
-    const operation = (rowData) => {
-        setFormData(rowData);
-        return <div>
-            <Button className="mx-2" label="Delete" severity="danger" onClick={event => confirmDelete(rowData?.id)} autoFocus />
-            <Button className="mx-2" label="Update" rowdata={rowData} onClick={() => { setShowModalUpdate(true); setFormData(rowData); }} />
-        </div>
-    };
-
 
     const onChangeData = (value, name) => {
         formData[name] = value;
     }
+
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
-        if(value !== ""){
-            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/material')
-            .then(res => {
-               let dataFilters = res.data.data.filter(el => el.name.toUpperCase().includes(value.toUpperCase()));
-               setDataMaterial(dataFilters);
-            })
-            .catch(err => { });
+        if (value !== "") {
+            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/colors')
+                .then(res => {
+                    let dataFilters = res.data.data.filter(el => el.name.toUpperCase().includes(value.toUpperCase()));
+                    setDataColor(dataFilters);
+                })
+                .catch(err => { });
+            console.log(dataColor);
         }
-        else{
+        else {
             gets();
         }
     };
-
     const initFilters = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -168,13 +153,27 @@ export const Material = () => {
             </span>
         </div>);
     };
+    const operation = (rowData) => {
+
+        return <div>
+            <Button className="mx-2" label="Delete" severity="danger" onClick={event => confirmDelete(rowData.id)} autoFocus />
+            <Button className="mx-2" label="Update" rowdata={rowData} onClick={() => { setShowModalUpdate(true); setFormData(rowData); }} />
+        </div>
+    };
+
+    const footerContentUpdate = () => {
+        return <div>
+            <Button label="Cancel" icon="pi pi-times" onClick={() => setShowModalUpdate(false)} className="p-button-text" />
+            <Button label="Submit" icon="pi pi-check" onClick={(rowdata) => handleUpdate(rowdata?.id)} autoFocus />
+        </div>
+    }
     const header = renderHeader();
 
     return (
         <div className="card">
             <Toast ref={toast} />
             <ConfirmDialog />
-            <DataTable value={dataMaterial}
+            <DataTable value={dataColor}
                 filters={filters}
                 header={header}
                 paginator
@@ -187,16 +186,13 @@ export const Material = () => {
                 paginatorRight={paginatorRight}>
                 <Column field="name" header="Name" style={{ width: '25%' }}></Column>
                 <Column field="description" header="Description" style={{ width: '25%' }}></Column>
-                <Column header="operation" body={operation} style={{ width: '25%' }}></Column>
-                <Column style={{ width: '25%' }}>
-                    <Button type="button" color="red" icon="pi pi-filter-slash" label="Add" outlined />
-                </Column>
+                <Column header="operation" body={operation} style={{ width: '25%' }}>
 
+                </Column>
             </DataTable>
             <Dialog className={"flex"} header="Create" visible={showModal}
                 style={{ width: '50vw' }}
                 onHide={() => setShowModal(false)} footer={footerContent}>
-
                 <div className={"flex p-2"}>
                     <InputText className={"w-full "}
                         type="text"
@@ -234,6 +230,5 @@ export const Material = () => {
                 </div>
             </Dialog>
         </div>
-
     )
 }

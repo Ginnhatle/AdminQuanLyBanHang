@@ -5,10 +5,10 @@ import TokenService from "./token.service";
 
 // const API_URL = "/auth";
 
-const signup = (username, password) => {
+const signup = (name, password) => {
   return api
     .post("/auth/signup", {
-      username,
+      name,
       password,
     })
     .then((response) => {
@@ -21,10 +21,10 @@ const signup = (username, password) => {
     });
 };
 
-const login = (username, password) => {
+const login = (name, password) => {
   return api
     .post("/auth/login", {
-      username,
+      name,
       password,
     })
     .then((response) => {

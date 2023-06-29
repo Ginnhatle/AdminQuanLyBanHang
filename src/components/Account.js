@@ -13,8 +13,8 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog } from 'primereact/confirmdialog'; // For <ConfirmDialog /> component
 import { confirmDialog } from 'primereact/confirmdialog'; // For confirmDialog method
 
-export const Brand = () => {
-    const [dataBrand, setDataBrand] = useState([]);
+export const Account = () => {
+    const [dataAccount, setDataAccount] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [showModalUpdate, setShowModalUpdate] = useState(false);
     const [filters, setFilters] = useState(null);
@@ -31,16 +31,17 @@ export const Brand = () => {
 
     // Get data
     function gets() {
-        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/brand')
-            .then(res => setDataBrand(res.data.data))
+        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/accounts')
+            .then(res => setDataAccount(res.data.data))
             .catch(err => { });
+        console.log(dataAccount);
     }
 
     // Add new brand
     const handleSubmit = (e) => {
         e.preventDefault();
         formData.id = null;
-        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/brand/saveOrUpdate', formData)
+        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/accounts/saveOrUpdate', formData)
             .then(res => {
                 if (res.status === 200) {
                     if (res.status === 200) {
@@ -60,8 +61,7 @@ export const Brand = () => {
 
     // Update brand
     const handleUpdate = (e) => {
-        console.log(formData);
-        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/brand/saveOrUpdate`, formData)
+        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/accounts/saveOrUpdate`, formData)
             .then(res => {
                 if (res.status === 200) {
                     toast.current.show({
@@ -85,7 +85,7 @@ export const Brand = () => {
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                axios.post('http://13.54.43.177:3030/mv-core/v1/admin/brand/delete/' + id)
+                axios.delete('http://13.54.43.177:3030/mv-core/v1/admin/accounts/delete/' + id)
                     .then(res => {
                         if (res.status === 200) {
                             toast.current.show({
@@ -120,16 +120,16 @@ export const Brand = () => {
 
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
-        if(value !== ""){
-            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/brand')
-            .then(res => {
-               let dataFilters = res.data.data.filter(el => el.name.toUpperCase().includes(value.toUpperCase()));
-               setDataBrand(dataFilters);
-            })
-            .catch(err => { });
-            console.log(dataBrand);
+        if (value !== "") {
+            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/accounts')
+                .then(res => {
+                    let dataFilters = res.data.data.filter(el => el.name.toUpperCase().includes(value.toUpperCase()));
+                    setDataAccount(dataFilters);
+                })
+                .catch(err => { });
+            console.log(dataAccount);
         }
-        else{
+        else {
             gets();
         }
     };
@@ -174,7 +174,7 @@ export const Brand = () => {
         <div className="card">
             <Toast ref={toast} />
             <ConfirmDialog />
-            <DataTable value={dataBrand}
+            <DataTable value={dataAccount}
                 filters={filters}
                 header={header}
                 paginator
@@ -185,8 +185,11 @@ export const Brand = () => {
                 currentPageReportTemplate="{first} to {last} of {totalRecords}"
                 paginatorLeft={paginatorLeft}
                 paginatorRight={paginatorRight}>
-                <Column field="name" header="Name" style={{ width: '25%' }}></Column>
-                <Column field="description" header="Description" style={{ width: '25%' }}></Column>
+                <Column field="name" header="Name" style={{ width: '15%' }}></Column>
+                <Column field="phone" header="Phone" style={{ width: '15%' }}></Column>
+                <Column field="email" header="Email" style={{ width: '15%' }}></Column>
+                <Column field="role" header="Role" style={{ width: '15%' }}></Column>
+                <Column field="status" header="Status" style={{ width: '15%' }}></Column>
                 <Column header="operation" body={operation} style={{ width: '25%' }}>
 
                 </Column>
@@ -194,43 +197,111 @@ export const Brand = () => {
             <Dialog className={"flex"} header="Create" visible={showModal}
                 style={{ width: '50vw' }}
                 onHide={() => setShowModal(false)} footer={footerContent}>
-                <div className={"flex p-2"}>
-                    <InputText className={"w-full "}
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >User Name: </label>
+                    <InputText className={"w-[85%] "}
                         type="text"
-                        placeholder="Name"
+                        placeholder="User Name"
                         onChange={(e) => onChangeData(e.target.value, "name")}
                     />
                 </div>
-                <div className={"flex items-center justify-between p-2"}>
-                    <InputTextarea rows={5} cols={30}
-                        className=" w-full"
-                        onChange={(e) => onChangeData(e.target.value, "description")}
-                        placeholder={"Description"} />
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Pass Word: </label>
+                    <InputText className={"w-[85%] "}
+                        type="password"
+                        placeholder="PassWord"
+                        onChange={(e) => onChangeData(e.target.value, "password")}
+                    />
+                </div>
+
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Phene: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Phone"
+                        onChange={(e) => onChangeData(e.target.value, "phone")}
+                    />
+                </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Email: </label>
+                    <InputText className={"w-[85%] "}
+                        type="email"
+                        placeholder="Email"
+                        onChange={(e) => onChangeData(e.target.value, "email")}
+                    />
+                </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Role: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Role"
+                        onChange={(e) => onChangeData(e.target.value, "role")}
+                    />
+                </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Status: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Status"
+                        onChange={(e) => onChangeData(e.target.value, "status")}
+                    />
                 </div>
             </Dialog>
             <Dialog className={"flex"} header="Update" visible={showModalUpdate}
                 style={{ width: '50vw' }}
                 onHide={() => setShowModalUpdate(false)} footer={footerContentUpdate}
             >
-                <div className={"flex p-2"}>
-                    <InputText className={"w-full "}
+            <div className={"flex p-2 items-center justify-between"}>
+                <label >User Name: </label>
+                <InputText className={"w-[85%] "}
+                    type="text"
+                    placeholder="User Name"
+                    name={"name"}
+                    defaultValue={formData.name}
+                    onChange={(e) => onChangeData(e.target.value, "name")}
+                />
+            </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Phone: </label>
+                    <InputText className={"w-[85%] "}
                         type="text"
-                        placeholder="Name"
-                        name={"name"}
-                        defaultValue={formData.name}
-                        onChange={(e) => onChangeData(e.target.value, "name")}
+                        placeholder="Phone"
+                        name={"phone"}
+                        defaultValue={formData.phone}
+                        onChange={(e) => onChangeData(e.target.value, "phone")}
                     />
                 </div>
-                <div className={"flex items-center justify-between p-2"}>
-                    <InputTextarea rows={5} cols={30}
-                        className=" w-full"
-                        name={"description"}
-                        defaultValue={formData.description}
-                        onChange={(e) => onChangeData(e.target.value, "description")}
-                        placeholder={"Description"} />
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Email: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Email"
+                        name={"email"}
+                        defaultValue={formData.email}
+                        onChange={(e) => onChangeData(e.target.value, "email")}
+                    />
+                </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Role: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Name"
+                        name={"role"}
+                        defaultValue={formData.role}
+                        onChange={(e) => onChangeData(e.target.value, "role")}
+                    />
+                </div>
+                <div className={"flex p-2 items-center justify-between"}>
+                    <label >Status: </label>
+                    <InputText className={"w-[85%] "}
+                        type="text"
+                        placeholder="Status"
+                        name={"status"}
+                        defaultValue={formData.status}
+                        onChange={(e) => onChangeData(e.target.value, "status")}
+                    />
                 </div>
             </Dialog>
         </div>
-
     )
 }

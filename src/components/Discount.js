@@ -6,15 +6,16 @@ import { Column } from "primereact/column";
 import { useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
-import { InputTextarea } from "primereact/inputtextarea";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog } from 'primereact/confirmdialog'; // For <ConfirmDialog /> component
 import { confirmDialog } from 'primereact/confirmdialog'; // For confirmDialog method
+import { Calendar } from 'primereact/calendar';
+import { InputNumber } from "primereact/inputnumber";
 
 
-export const Material = () => {
-    const [dataMaterial, setDataMaterial] = useState([]);
+export const Discount = () => {
+    const [discount, setDiscount] = useState([]);
     const [showModalUpdate, setShowModalUpdate] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const toast = useRef(null);
@@ -30,18 +31,17 @@ export const Material = () => {
 
     // Get all
     function gets() {
-        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/material')
-            .then(res => setDataMaterial(res.data.data))
+        axios.get('http://13.54.43.177:3030/mv-core/v1/admin/discount')
+            .then(res => setDiscount(res.data.data))
             .catch(err => { });
+        console.log(discount);
     }
     // Add new
     const handleSubmit = (e) => {
         e.preventDefault();
         formData.id = null;
-        console.log(formData);
-        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/material/saveOrUpdate', formData)
+        axios.post('http://13.54.43.177:3030/mv-core/v1/admin/discount/saveOrUpdate', formData)
             .then(res => {
-                setDataMaterial([...dataMaterial, res.data.data]);
                 setFormData({});
                 setShowModal(false);
                 if (res.status === 200) {
@@ -59,7 +59,7 @@ export const Material = () => {
     // Update
     const handleUpdate = (e) => {
         console.log(formData);
-        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/material/saveOrUpdate`, formData)
+        axios.post(`http://13.54.43.177:3030/mv-core/v1/admin/discount/saveOrUpdate`,formData)
             .then(res => {
                 if (res.status === 200) {
                     toast.current.show({
@@ -82,7 +82,7 @@ export const Material = () => {
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                axios.delete('http://13.54.43.177:3030/mv-core/v1/admin/material/delete/' + id)
+                axios.delete('http://13.54.43.177:3030/mv-core/v1/admin/discount/delete/' + id)
                     .then(res => {
                         if (res.status === 200) {
                             toast.current.show({
@@ -121,7 +121,6 @@ export const Material = () => {
     }
 
     const operation = (rowData) => {
-        setFormData(rowData);
         return <div>
             <Button className="mx-2" label="Delete" severity="danger" onClick={event => confirmDelete(rowData?.id)} autoFocus />
             <Button className="mx-2" label="Update" rowdata={rowData} onClick={() => { setShowModalUpdate(true); setFormData(rowData); }} />
@@ -131,14 +130,17 @@ export const Material = () => {
 
     const onChangeData = (value, name) => {
         formData[name] = value;
+        setFormData(formData);
+        console.log(formData);
     }
+
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
         if(value !== ""){
-            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/material')
+            axios.get('http://13.54.43.177:3030/mv-core/v1/admin/discount')
             .then(res => {
                let dataFilters = res.data.data.filter(el => el.name.toUpperCase().includes(value.toUpperCase()));
-               setDataMaterial(dataFilters);
+               setDiscount(dataFilters);
             })
             .catch(err => { });
         }
@@ -146,7 +148,7 @@ export const Material = () => {
             gets();
         }
     };
-
+    
     const initFilters = () => {
         setFilters({
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -170,11 +172,20 @@ export const Material = () => {
     };
     const header = renderHeader();
 
+    const convertTime = (time) => {
+        console.log(time);
+        var date = new Date(time);
+        var formattedDate = date.toISOString();
+        console.log(formattedDate); // Output: 2023-06-26T17:00:00+07:00
+
+        return formattedDate;
+    }
+
     return (
         <div className="card">
             <Toast ref={toast} />
             <ConfirmDialog />
-            <DataTable value={dataMaterial}
+            <DataTable value={discount}
                 filters={filters}
                 header={header}
                 paginator
@@ -185,18 +196,21 @@ export const Material = () => {
                 currentPageReportTemplate="{first} to {last} of {totalRecords}"
                 paginatorLeft={paginatorLeft}
                 paginatorRight={paginatorRight}>
-                <Column field="name" header="Name" style={{ width: '25%' }}></Column>
-                <Column field="description" header="Description" style={{ width: '25%' }}></Column>
+                <Column field="name" header="Name" style={{ width: '5%' }}></Column>
+                <Column field="description" header="Description" style={{ width: '15%' }}></Column>
+                <Column field="discount" header="Discount" style={{ width: '15%' }}></Column>
+                <Column field="start_date" header="Start date" style={{ width: '15%' }}></Column>
+                <Column field="end_date" header="End date" style={{ width: '5%' }}></Column>
+                <Column field="status" header="Status" style={{ width: '15%' }}></Column>
                 <Column header="operation" body={operation} style={{ width: '25%' }}></Column>
                 <Column style={{ width: '25%' }}>
                     <Button type="button" color="red" icon="pi pi-filter-slash" label="Add" outlined />
                 </Column>
-
             </DataTable>
             <Dialog className={"flex"} header="Create" visible={showModal}
                 style={{ width: '50vw' }}
                 onHide={() => setShowModal(false)} footer={footerContent}>
-
+                <label >Name: </label>
                 <div className={"flex p-2"}>
                     <InputText className={"w-full "}
                         type="text"
@@ -204,33 +218,92 @@ export const Material = () => {
                         onChange={(e) => onChangeData(e.target.value, "name")}
                     />
                 </div>
-                <div className={"flex items-center justify-between p-2"}>
-                    <InputTextarea rows={5} cols={30}
-                        className=" w-full"
+                <label >Description: </label>
+                <div className={"flex p-2"}>
+                    <InputText className={"w-full "}
+                        type="text"
+                        placeholder="Description"
                         onChange={(e) => onChangeData(e.target.value, "description")}
-                        placeholder={"Description"} />
+                    />
+                </div>
+                <label >Discount: </label>
+                <div className={"flex p-2"}>
+                    <InputNumber className={"w-full "}
+                        placeholder="Discount"
+                        onChange={(e) => onChangeData(e.target.value, "discount")}
+                        min={1}
+                    />
+                </div>
+                <label >Start date: </label>
+                <div className={"flex p-2"}>
+                    <Calendar className={"w-full "}
+                        placeholder="Shoulder Width"
+                        onChange={(e) => onChangeData(convertTime(e.target.value), "start_date")}
+                    />
+                </div>
+                <label >End date: </label>
+                <div className={"flex p-2"}>
+                    <Calendar className={"w-full "}
+                        placeholder="End date"
+                        onChange={(e) => onChangeData(convertTime(e.target.value), "end_date")}
+                    />
                 </div>
             </Dialog>
             <Dialog className={"flex"} header="Update" visible={showModalUpdate}
                 style={{ width: '50vw' }}
                 onHide={() => setShowModalUpdate(false)} footer={footerContentUpdate}
             >
+                <label >Name: </label>
                 <div className={"flex p-2"}>
                     <InputText className={"w-full "}
                         type="text"
                         placeholder="Name"
-                        name={"name"}
                         defaultValue={formData.name}
                         onChange={(e) => onChangeData(e.target.value, "name")}
                     />
                 </div>
-                <div className={"flex items-center justify-between p-2"}>
-                    <InputTextarea rows={5} cols={30}
-                        className=" w-full"
-                        name={"description"}
+                <label >Description: </label>
+                <div className={"flex p-2"}>
+                    <InputText className={"w-full "}
+                        type="text"
+                        placeholder="Description"
                         defaultValue={formData.description}
                         onChange={(e) => onChangeData(e.target.value, "description")}
-                        placeholder={"Description"} />
+                    />
+                </div>
+                <label >Discount: </label>
+                <div className={"flex p-2"}>
+                    <InputNumber className={"w-full "}
+                        value={formData.discount}
+                        placeholder="Discount"
+                        onChange={(e) => onChangeData(e.value, "discount")}
+                        min={1}
+                    />
+                </div>
+                <label >Start date: </label>
+                <div className={"flex p-2"}>
+                    <Calendar className={"w-full "}
+                        placeholder="Start date"
+                        value={formData.start_date}
+                        onChange={(e) => onChangeData(convertTime(e.target.value), "start_date")}
+                    />
+                </div>
+                <label >End date: </label>
+                <div className={"flex p-2"}>
+                    <Calendar className={"w-full "}
+                        placeholder="End date"
+                        value={formData.endate}
+                        onChange={(e) => onChangeData(convertTime(e.target.value), "end_date")}
+                    />
+                </div>
+                <label >Status: </label>
+                <div className={"flex p-2"}>
+                    <InputText className={"w-full "}
+                        type="text"
+                        placeholder="Status"
+                        defaultValue={formData.status}
+                        onChange={(e) => onChangeData(e.target.value, "status")}
+                    />
                 </div>
             </Dialog>
         </div>
