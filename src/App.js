@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import Home from "./pages/Home";
-import ProductDetails from "./pages/ProductDetails";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import Footer from "./components/Footer";
 import {Login} from "./pages/Login";
 import AuthService from "./service/auth.service";
+import {Home} from "./pages/home/Home";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "/node_modules/primeflex/primeflex.css"
+import {Admin} from "./pages/home/Admin";
+import 'primeicons/primeicons.css';
 
 const App = () => {
     const [currentUser, setCurrentUser] = useState(undefined);
@@ -21,22 +22,19 @@ const App = () => {
     const logOut = () => {
         AuthService.logout();
     };
-    return(
+    return (
         <div className='overflow-hidden'>
-
             <Router>
                 <Routes>
                     <Route path={'/'} element={<Login/>}/>
-                    {/*{currentUser?*/}
+                    {currentUser ?
                         <Route path={'/home'} element={<Home/>}/>
-                    {/*:("")*/}
-                    }
-                    {/*{currentUser?*/}
-                        <Route path={'/product/:id'} element={<ProductDetails/>}/>
-                    {/*:("")*/}
-                    }
+                        : ""}
+                    {currentUser ?
+                        <Route path={'/admin'} element={<Admin/>}/>
+                        : ""}
+
                 </Routes>
-                <Sidebar/>
             </Router>
 
         </div>

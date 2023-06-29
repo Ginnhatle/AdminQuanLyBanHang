@@ -4,7 +4,7 @@ import AuthService from "./auth.service";
 import { useNavigate } from "react-router-dom";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3030/mv-core/v1",
+  baseURL: "http://13.54.43.177:3030/mv-core/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,7 +13,6 @@ const instance = axios.create({
 // Before making request, do the following
 instance.interceptors.request.use(
   (config) => {
-    // console.log("getLocalAccessToken", TokenService.getLocalAccessToken());
     const token = TokenService.getLocalAccessToken();
     if (token) {
       config.headers["x-auth-token"] = token;
@@ -38,20 +37,12 @@ instance.interceptors.response.use(
       if (err.response.status === 403 && !originalConfig._retry) {
         // handle infinite loop
         originalConfig._retry = true;
-
-        // console.log("refresh", TokenService.getLocalRefreshToken());
         try {
           const rs = await instance.post("/auth/login", {
             refreshToken: TokenService.getLocalRefreshToken(),
           });
-
-          console.log("response", rs);
-
           const { accessToken } = rs.data;
-
-          console.log("updateNewAccessToken", accessToken);
           TokenService.updateNewAccessToken(accessToken);
-
           return instance(originalConfig);
         } catch (_error) {
           return Promise.reject(_error);
